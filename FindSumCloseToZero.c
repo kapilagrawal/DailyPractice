@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+//commit update
 int main(void) 
 {
 	int arr[] = {1, 60, -10, 70, -80, 85};
