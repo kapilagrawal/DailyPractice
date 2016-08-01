@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+struct TreeNode
+{
+	int data;
+	struct TreeNode *left, *right;
+};
+
+struct QueueNode
+{
+	struct TreeNode *tree;
+	struct QueueNode *next;
+};
+
+struct Queue
+{
+	struct QueueNode *front;
+	struct QueueNode *rear;
+};
+
+struct Queue* CreateListQueue()
+{
+	struct Queue *Q = (struct Queue*)malloc(sizeof(struct Queue));
+	if(!Q) return;
+
+	Q->front = Q->rear = NULL;
+
+	return Q;
+}
+
+void Enqueue(struct Queue **Q, struct TreeNode *root)
+{
+	struct QueueNode *new = (struct QueueNode*)malloc(sizeof(struct QueueNode));
+	if(!new)return;
+	
+	new->tree = root;
+	new->next = NULL;
+
+	if((*Q)->front == NULL)
+		(*Q)->front = (*Q)->rear = new;
+	else
+	{
+		(*Q)->rear->next = new;
+		(*Q)->rear = new;
+	}
+}
+
+struct TreeNode* Dequeue(struct Queue **Q)
+{
+	struct TreeNode *Tnode = NULL;
+	struct QueueNode *Qnode = (*Q)->front;
+	Tnode = Qnode->tree;
+	(*Q)->front = (*Q)->front->next;
+	free(Qnode);
+	return Tnode;
+}
+
+int IsEmptyQueue(struct Queue *Q)
+{
+	if(Q->front == NULL)
+		return 1;
+	else
+		return 0;
+}
+
+void DeleteQueue(struct Queue **Q)
+{
+	struct QueueNode *tmp = (*Q)->front;
+	struct QueueNode *del = NULL;//(*Q)->front;
+	while(tmp)
+	{
+		del = tmp;
+		tmp = tmp->next;
+		free(del);
+	}
+	if(*Q)
+		free(*Q);
+	printf("\nQ deleted\n");
+}
+void IterativeLevelOrderTraversal(struct TreeNode *root)
+{
+	struct Queue *Q = CreateListQueue();
+
+	if(!root) return;
+
+	Enqueue(&Q, root);
+
+	while(!IsEmptyQueue(Q))
+	{
+		root = Dequeue(&Q);
+		printf("%d ", root->data);
+		if(root->left)
+			Enqueue(&Q, root->left);
+		if(root->right)
+			Enqueue(&Q, root->right);
+	}
+	DeleteQueue(&Q);
+}
+
+struct TreeNode* CreateTreeNode(int data)
+{
+	struct TreeNode *new = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+	if (!new) return;
+
+	new->data = data;
+	new->left = new->right = NULL;
+
+	return new;
+}
+
+int main()
+{
+	struct TreeNode *root = NULL;
+
+	root = CreateTreeNode(1);
+	root->left = CreateTreeNode(2);
+	root->right = CreateTreeNode(3);
+	root->left->left = CreateTreeNode(4);
+	root->left->right = CreateTreeNode(5);
+	root->right->left = CreateTreeNode(6);
+	root->right->right= CreateTreeNode(7);
+
+	IterativeLevelOrderTraversal(root);
+	printf("\n");
+	return 0;
+}
